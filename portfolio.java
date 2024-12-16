@@ -102,3 +102,137 @@ public class Portfolio {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Loads investment data from a specified file in the "portfolio" directory. The
+     * file should be
+     * formatted in a specific way that aligns with the saveInvestments method's
+     * output. The method
+     * reads each investment's type, symbol, name, quantity, price, and book value,
+     * then creates and
+     * adds the corresponding Stock or MutualFund object to the investments list.
+     * Returns true if the
+     * file exists and is successfully read; otherwise, returns false.
+     * 
+     * @param filename the name of the file (without extension) to load the
+     *                 investments from
+     * @return boolean indicating whether the investments were successfully loaded
+     */
+    public boolean loadInvestments(String filename) {
+        //Creating the file object
+        File file = new File("portfolio", filename + ".portfolio");
+
+        if (file.exists()) {
+
+            try (Scanner reader = new Scanner(file)) {
+
+                while (reader.hasNextLine()) { //Reading data from the file line by line
+
+                    if (reader.hasNextLine() == false) { //Exiting the loop when the file ends
+                        break;
+                    }
+
+                    String typeLine = getNextLine(reader);
+                    if (typeLine.contains("=") == false) { //Skip when the line does not contain "="
+                        continue;
+                    }
+
+                    String type = performSplit(typeLine, "\"", 1); //Getting the investment type from the file
+
+                    String symbolLine = getNextLine(reader);
+                    String symbol = performSplit(symbolLine, "\"", 1); //Getting the investment symbol from the file
+
+                    String nameLine = getNextLine(reader);
+                    String name = performSplit(nameLine, "\"", 1); //Getting the investment name from the file
+
+                    String quantityLine = getNextLine(reader);
+                    int quantity = parseToInt(performSplit(quantityLine, "=", 1)); //Getting the investment quantity from the file
+
+                    String priceLine = getNextLine(reader);
+                    double price = parseToDouble(performSplit(priceLine, "=", 1)); //Getting the investment price from the file
+
+                    String bookValueLine = getNextLine(reader);
+                    double bookValue = parseToDouble(performSplit(bookValueLine, "=", 1)); //Getting the investment book value from the file
+
+                    //Adding the investments to the investments arraylist
+                    if (type.equalsIgnoreCase("Stock")) {
+                        investments.add(new Stock(symbol, name, quantity, price, bookValue));
+                    } else if (type.equalsIgnoreCase("MutualFund")) {
+                        investments.add(new MutualFund(symbol, name, quantity, price, bookValue));
+                    }
+                }
+                return true;
+
+            } catch (FileNotFoundException e) {
+                System.err.println("File not found: " + e.getMessage());
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Retrieves the next line from the provided Scanner object if available.
+     * If no line is available, returns an empty string.
+     *
+     * @param reader the Scanner object used to read lines from an input source
+     * @return the next line as a String if available, otherwise an empty string
+     */
+    private String getNextLine(Scanner reader) {
+        if (reader.hasNextLine()) {
+            return reader.nextLine();
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Splits a line of text into parts using a regular expression, and returns
+     * the part at the given index. If the line is not split into enough parts
+     * to have a part at the given index, an empty string is returned.
+     *
+     * @param line  the line of text to be split
+     * @param regex the regular expression to be used for splitting
+     * @param i     the index of the part to be returned
+     * @return the part at the given index, or an empty string if no such part
+     *         exists
+     */
+    private String performSplit(String line, String regex, int i) {
+        String[] parts = line.split(regex);
+        if (parts.length > i) {
+            return parts[i];
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Parses the given string as an integer, or returns 0 if parsing fails
+     * (for example, if the string does not represent a valid integer)
+     *
+     * @param number the string to be parsed
+     * @return the parsed integer, or 0 if parsing fails
+     */
+    private int parseToInt(String number) {
+        try {
+            return Integer.parseInt(number.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Parses the given string as a double, or returns 0.0 if parsing fails
+     * (for example, if the string does not represent a valid double)
+     *
+     * @param number the string to be parsed
+     * @return the parsed double, or 0.0 if parsing fails
+     */
+    private double parseToDouble(String number) {
+        try {
+            return Double.parseDouble(number.trim());
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+    
