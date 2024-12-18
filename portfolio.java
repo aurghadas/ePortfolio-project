@@ -346,3 +346,78 @@ public class Portfolio {
 
         return "";
     }
+    
+/**
+     * Updates the price of the investment with the given symbol and name to the given price.
+     * Iterates through the investments arraylist and updates the price for all existing objects
+     * with the given symbol and name.
+     * Returns a string indicating the success of the update and the updated details of the investment.
+     * If the investment is not found, an empty string is returned.
+     *
+     * @param Symbol the symbol of the investment to update
+     * @param price the new price to set for the investment
+     * @param name the name of the investment to update
+     * @return a string indicating the success of the update
+     */
+    public String update(String Symbol, Double price, String name) {
+
+        //Iterating through all the investments int the arraylist and update price for all existing objects
+        for (int i = 0; i < investments.size(); i++) {
+            Investment currentInvestment = investments.get(i);
+
+            if (currentInvestment.getSymbol().equalsIgnoreCase(Symbol) && currentInvestment.getName().equalsIgnoreCase(name)) {
+                currentInvestment.updatePrice(price);
+                return "The following investment price has been updated successfully:" + "\n\n" +
+                        "Symbol: " + currentInvestment.getSymbol() + "\n" +
+                        "Name: " + currentInvestment.getName() + "\n" +
+                        "Price: " + currentInvestment.getPrice() + "\n";
+            }
+
+        }
+        return " ";
+    }
+
+    /**
+     * Calculates the total gain from all investments.
+     * 
+     * This method iterates through the investments arraylist and calls the `calculateGain` method of each investment.
+     * The sum of all gains is returned as a string.
+     * 
+     * @return a string representing the total gain from all investments, in dollars
+     */
+    public String calculateGain() {
+        double sum = 0;
+
+        // Iterating through the investments arraylist and accumulating total gain
+        for (int i = 0; i < investments.size(); i++) {
+            Investment currentInvestment = investments.get(i);
+            sum = sum + currentInvestment.calculateGain();
+        }
+
+        return "$" + sum;
+    }
+
+    /**
+     * Calculates the gain for each investment in the portfolio and returns a string array
+     * containing the gain for each investment. The gain for each investment is the difference
+     * between the current value of the investment and its book value. It iterates through the
+     * list of investments, calls the calculateGain method on each investment object, and
+     * accumulates the gain. Finally, it returns a string array with the gain for each investment.
+     *
+     * @return a string array containing the gain for each investment
+     */
+    public String[] calculateIndividualInvestmentGain() {
+        String[] result = new String[investments.size()];
+
+        //Iterating through the investments arraylist and accumulating total gain
+        for (int i = 0; i < investments.size(); i++) {
+            Investment currentInvestment = investments.get(i);
+            double sum = currentInvestment.calculateGain();
+            result[i] = "Symbol: " + currentInvestment.getSymbol() + "\n" +
+                    "Name: " + currentInvestment.getName() + "\n" +
+                    "Gain: $" + sum + "\n";
+        }
+
+        return result;
+    }
+
