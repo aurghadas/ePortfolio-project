@@ -236,3 +236,113 @@ public class Portfolio {
         }
     }
     
+/**
+     * Buys a specified quantity of an investment at a given price.
+     * If the investment does not exist in the portfolio, a new one is created.
+     * If the investment already exists, the quantity is updated.
+     * 
+     * @param type the type of investment (Stock or MutualFund)
+     * @param symbol the symbol of the investment
+     * @param name the name of the investment
+     * @param quantity the number of units to buy
+     * @param price the price per unit of the investment
+     * @return a string indicating the success of the purchase
+     */
+    public String buy(String type, String symbol, String name, int quantity, double price) { // Made changes
+        Investment currentInvestment = null;
+
+        //Check to see if any investment with the same symbol already exists or not
+        if (type.equalsIgnoreCase("Stock")) {
+            for (int i = 0; i < investments.size(); i++) {
+                if (investments.get(i).getSymbol().equals(symbol) && !investments.get(i).isStock()) {
+                    return "Symbol exists as MutualFund, not as Stock!";
+                }
+            }
+        }else if (type.equalsIgnoreCase("MutualFund")) {
+            for (int i = 0; i < investments.size(); i++) {
+                if (investments.get(i).getSymbol().equals(symbol) && investments.get(i).isStock()) {
+                    return "Symbol exists as Stock, not as MutualFund!";
+                }
+            }
+        }
+
+        //Looking for the investment in the existing list
+        for (int i = 0; i < investments.size(); i++) {
+            if (investments.get(i).getSymbol().equals(symbol)) {
+                currentInvestment = investments.get(i);
+                break;
+            }
+        }
+
+        if (currentInvestment == null) { //If the investment is not found, create a new one based on its type
+
+            if (type.equalsIgnoreCase("Stock")) {
+                currentInvestment = new Stock(symbol, name, quantity, price);
+                investments.add(currentInvestment);
+                return "Following Stock added successfully!" + "\n\n" +
+                        "Symbol: " + currentInvestment.getSymbol() + "\n" +
+                        "Name: " + currentInvestment.getName() + "\n" +
+                        "Quantity: " + currentInvestment.getQuantity() + "\n" +
+                        "Price: " + currentInvestment.getPrice() + "\n";
+
+            } else if (type.equalsIgnoreCase("MutualFund")) {
+                currentInvestment = new MutualFund(symbol, name, quantity, price);
+                investments.add(currentInvestment);
+                return "Following MutualFund added successfully!" + "\n\n" +
+                        "Symbol: " + currentInvestment.getSymbol() + "\n" +
+                        "Name: " + currentInvestment.getName() + "\n" +
+                        "Quantity: " + currentInvestment.getQuantity() + "\n" +
+                        "Price: " + currentInvestment.getPrice() + "\n";
+            }
+
+        } else {
+            String message = currentInvestment.buy(quantity, price); // If the investment is found in the existing list, just buy it
+            return message;
+        }
+
+        return "";  
+    }
+
+
+    /**
+     * Sells a specified quantity of an investment at a given price.
+     * Iterates through the investments arraylist to find the investment object
+     * with the given symbol. If the investment is found, the sell method is
+     * called to update the quantity and book value of the investment.
+     * If the investment is not found, an error message is printed.
+     * 
+     * @param symbol the symbol of the investment
+     * @param quantity the number of units to sell
+     * @param price the price per unit of the investment
+     * @return a string indicating the success of the sale
+     */
+    public String sell(String symbol, int quantity, double price) {
+
+        boolean found = false;
+
+        // Iterating through the investments arraylist to find the investment object with the given symbol
+        for (int i = 0; i < investments.size(); i++) {
+            Investment currentInvestment = investments.get(i);
+
+            //Checking if the investment is a stock or a mutual fund and selling it accordingly
+            if (currentInvestment.getSymbol().equalsIgnoreCase(symbol) && currentInvestment instanceof Stock) {
+                String message = ((Stock) currentInvestment).sell(investments, symbol, quantity, price);
+                found = true;
+
+                return message;
+
+            } else if (currentInvestment.getSymbol().equalsIgnoreCase(symbol) && currentInvestment instanceof MutualFund) {
+                String message = ((MutualFund) currentInvestment).sell(investments, symbol, quantity, price);
+                found = true;
+
+                return message;
+            }
+        }
+
+        //Printing error message if the investment was not found
+        if (found == false) {
+            return "No investment found with the symbol: (" + symbol + ")";
+        }
+
+        return "";
+    }
