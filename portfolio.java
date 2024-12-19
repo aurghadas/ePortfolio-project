@@ -421,3 +421,113 @@ public class Portfolio {
         return result;
     }
 
+/**
+     * Searches for investments that match the given criteria and returns an array of strings
+     * containing the details of the matching investments. The search criteria includes the symbol
+     * of the investment, the price range, and keywords in the name of the investment. If no
+     * matching investments are found, a message is displayed indicating that no investments were
+     * found.
+     * 
+     * @param symbol the symbol of the investment to search for
+     * @param minPrice the minimum price of the investment
+     * @param maxPrice the maximum price of the investment
+     * @param keywords the keywords to search for in the name of the investment
+     * @return an array of strings containing the details of the matching investments
+     */
+    public String[] searchOperation(String symbol, String minPrice, String maxPrice, String keywords) {
+        List<String> resultList = new ArrayList<>(); //Use a List to collect the results
+        myHashMap.clear(); //Clearing the HashMap
+
+        // Iterating through the investments arraylist and adding words to the HashMap
+        for (int i = 0; i < investments.size(); i++) {
+
+            String symbolAndName = (investments.get(i).getSymbol() + " " + investments.get(i).getName()).toLowerCase(); //Combining symbol and name
+            String[] parts = symbolAndName.split("\\s+"); //Splitting the combined string based on spaces
+
+            for (int j = 0; j < parts.length; j++) {
+                String part = parts[j];
+                myHashMap.computeIfAbsent(part, k -> new ArrayList<>()).add(i); //Mapping the word to its list of indexes
+            }
+        }
+
+        //Getting input from the user for the search operation
+        String searchSymbol = symbol.trim();
+
+        String priceInput = minPrice + "-" + maxPrice;
+
+        //initializing the lower and upper price
+        double lowerPrice = 0;
+        double upperPrice = Double.MAX_VALUE;
+
+        //Processing user input for price
+        if (priceInput.length() > 1) {
+            String[] prices = priceInput.split("-");
+            lowerPrice = parseToDouble(prices[0].trim(), 0);
+
+            if (prices.length > 1) {
+                upperPrice = parseToDouble(prices[1].trim(), Double.MAX_VALUE);
+            } else {
+                upperPrice = Double.MAX_VALUE;
+            }
+        }
+
+        keywords = keywords.trim();
+
+        List<Integer> filteredIndexes = new ArrayList<>(); //ArrayList for storing filtered indexes
+
+        if (keywords.isEmpty() == false) {
+
+            String[] words = keywords.toLowerCase().split("\\s+");
+            Set<Integer> matchedIndexes = new HashSet<>(); //Creating a set for storing matched indexes
+            boolean isFirst = true;
+
+            //Iterating through the words in order to get the list of indexes
+            for (int i = 0; i < words.length; i++) {
+
+                String word = words[i];
+                List<Integer> positions = myHashMap.get(word); // Getting the list of indexes for the word from the HashMap
+
+                if (positions == null) { //Case where the word is not found
+                    filteredIndexes.clear();
+                    break;
+                } else if (isFirst == true) { //Case where the first valid keyword is found
+                    matchedIndexes.addAll(positions);
+                    isFirst = false;
+                } else { //Case where the first valid keyword is not found
+                    matchedIndexes.retainAll(positions);
+                }
+            }
+            filteredIndexes.addAll(matchedIndexes); //Adding the matched indexes to the filteredIndexes
+
+        } else {
+            //Case where no keywords are provided by the user
+            for (int i = 0; i < investments.size(); i++) {
+                filteredIndexes.add(i);
+            }
+        }
+
+        boolean matchFound = false;  //Flag to indicate if a match is found not not
+
+        // Iterating through the filtered indexes to find matching investments
+        for (int i = 0; i < filteredIndexes.size(); i++) {
+
+            int j = filteredIndexes.get(i);
+            Investment currentInvestment = investments.get(j);
+            boolean matchesSymbol = (searchSymbol.isEmpty() || currentInvestment.getSymbol().equalsIgnoreCase(searchSymbol)); // Checking if the current investment matches the symbol given by the user
+            boolean withinPriceRange = (lowerPrice == 0.0 && upperPrice == 0.0) || (currentInvestment.getPrice() >= lowerPrice && currentInvestment.getPrice() <= upperPrice); // Checking if the current investment is within the given price range
+
+            //Print investment details if it matches the given criteria
+            if (matchesSymbol == true && withinPriceRange == true) {
+
+                resultList.add(currentInvestment.printDetails());
+                matchFound = true;
+            }
+        }
+
+        if (matchFound == false) { //Case where no matching investments are found
+            resultList.add("No investments found matching the given criteria.");
+        }
+
+        return resultList.toArray(new String[0]);
+    }
+    
