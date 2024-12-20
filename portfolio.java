@@ -531,3 +531,20 @@ public class Portfolio {
         return resultList.toArray(new String[0]);
     }
     
+/**
+ * Parses the given string as a double. If parsing fails due to an invalid format,
+ * the specified fallback value is returned.
+ *
+ * @param value the string to be parsed as a double
+ * @param fallback the value to return if parsing fails
+ * @return the parsed double value, or the fallback value if parsing fails
+ */
+    private double parseToDouble(String value, double fallback) {
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
+    }
+
+}
