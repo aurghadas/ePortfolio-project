@@ -97,3 +97,60 @@ public abstract class Investment {
     public double getBookValue() {
         return bookValue;
     }
+
+/**
+     * Determines if the investment is a stock.
+     *
+     * @return true if the investment is a stock; false otherwise.
+     */
+    public abstract boolean isStock();
+
+    /**
+     * Initiates a buy transaction.
+     * 
+     * @param quantity the number of units to buy
+     * @param price the price at which to buy
+     * @return a string indicating the result of the transaction
+     */
+    public abstract String buy(int quantity, double price);
+
+    /**
+     * Initiates a sell transaction.
+     * 
+     * @param investments the list of investments to sell from
+     * @param Symbol the symbol of the investment to sell
+     * @param quantity the number of units to sell
+     * @param price the price at which to sell
+     * @return a string indicating the result of the transaction
+     */
+    public abstract String sell(ArrayList<Investment> investments, String Symbol, int quantity, double price);
+
+    /**
+     * Calculates the gain or loss of the investment.
+     *
+     * @return the calculated gain or loss by amount
+     */
+    public abstract double calculateGain();
+    
+    /**
+     * Returns a string containing the details of the investment.
+     * 
+     * The string includes the symbol, name, price, quantity, and book value of the investment.
+     * 
+     * @return a formatted string containing the investment details
+     */
+    public String printDetails(){
+        return"Symbol: " + this.symbol + "\nName: " + this.name + "\nPrice: " + this.price + "\nQuantity: " + this.quantity + "\nBookValue: " + this.bookValue + "\n";
+    }
+    /**
+     * Updates the price of the investment to the specified value.
+     * Prints a message indicating the updated price for the investment.
+     *
+     * @param updatedPrice the new price to set for the investment
+     */
+    public void updatePrice(double updatedPrice){
+        this.previousPrice = this.price;
+        this.price = updatedPrice;  //Updating the price based on given updated price
+        
+    }
+    
