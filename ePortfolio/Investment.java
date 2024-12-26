@@ -98,3 +98,99 @@ public abstract class Investment {
         return bookValue;
     }
   
+/**
+     * Determines if the investment is a stock.
+     *
+     * @return true if the investment is a stock; false otherwise.
+     */
+    public abstract boolean isStock();
+
+    /**
+     * Initiates a buy transaction.
+     * 
+     * @param quantity the number of units to buy
+     * @param price the price at which to buy
+     * @return a string indicating the result of the transaction
+     */
+    public abstract String buy(int quantity, double price);
+
+    /**
+     * Initiates a sell transaction.
+     * 
+     * @param investments the list of investments to sell from
+     * @param Symbol the symbol of the investment to sell
+     * @param quantity the number of units to sell
+     * @param price the price at which to sell
+     * @return a string indicating the result of the transaction
+     */
+    public abstract String sell(ArrayList<Investment> investments, String Symbol, int quantity, double price);
+
+    /**
+     * Calculates the gain or loss of the investment.
+     *
+     * @return the calculated gain or loss by amount
+     */
+    public abstract double calculateGain();
+    
+    /**
+     * Returns a string containing the details of the investment.
+     * 
+     * The string includes the symbol, name, price, quantity, and book value of the investment.
+     * 
+     * @return a formatted string containing the investment details
+     */
+    public String printDetails(){
+        return"Symbol: " + this.symbol + "\nName: " + this.name + "\nPrice: " + this.price + "\nQuantity: " + this.quantity + "\nBookValue: " + this.bookValue + "\n";
+    }
+    /**
+     * Updates the price of the investment to the specified value.
+     * Prints a message indicating the updated price for the investment.
+     *
+     * @param updatedPrice the new price to set for the investment
+     */
+    public void updatePrice(double updatedPrice){
+        this.previousPrice = this.price;
+        this.price = updatedPrice;  //Updating the price based on given updated price
+        
+    }
+
+   /**
+     * Updates the quantity of the investment.
+     * 
+     * The quantity is incremented by the given updated quantity.
+     * 
+     * @param updatedQuantity the amount to add to the current quantity
+     */
+    public void updateQuantity(int updatedQuantity){
+        this.quantity += updatedQuantity;  //Updating the quantity based on given updated quantity
+    }
+
+    /**
+     * Returns a string representation of the investment.
+     * 
+     * The string includes the symbol, name, quantity, price, and book value of the investment.
+     * 
+     * @return a formatted string representation of the investment
+     */
+    @Override
+    public String toString() {
+        return "Symbol: " + this.symbol + "\nName: " + this.name + "\nQuantity: " + this.quantity + "\nPrice: " + this.price + "\nBookValue: " + this.bookValue + "\n";
+    }
+
+/**
+ * Compares this investment with the specified object for equality.
+ * Returns true if the specified object is also an Investment and has
+ * the same symbol as this investment.
+ *
+ * @param o the object to compare with this investment
+ * @return true if the specified object is equal to this investment; false otherwise
+ */
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Investment) {
+            Investment other = (Investment) o;
+            return this.symbol.equals(other.symbol);
+        }
+        return false;
+    }
+}
