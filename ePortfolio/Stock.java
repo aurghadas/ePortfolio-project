@@ -99,3 +99,70 @@ public class Stock extends Investment{
         return "Purchased successfully!";
     }
 
+
+/**
+     * Sells a portion of the investment.
+     * 
+     * This method updates the price of the investment, calculates the payment, and removes the investment from the list if the entire quantity is sold.
+     * 
+     * @param investments the list of investments to remove from if the entire quantity is sold
+     * @param Symbol the symbol of the investment to sell
+     * @param quantity the number of shares to sell
+     * @param price the price at which to sell
+     * @return a string indicating the result of the sale, including the payment received and the updated investment details
+     */
+    @Override
+    public String sell(ArrayList<Investment> investments, String Symbol, int quantity, double price){
+        
+        this.updatePrice(price);  //Updating the price
+
+        if(this.getQuantity() == quantity){  //Case when updated price is same as before
+            double payment = (this.price * this.quantity) - comission;
+
+            investments.remove(this);  //Removing the stock from the list if user chooses to sell total
+            return "Payment received: " + payment + "\n" +     
+                    "This stock is sold and removed from our list:" + "\n" +
+                    "Symbol: " + Symbol + "\n" +
+                    "Name: " + this.getName() + "\n" +
+                    "Quantity: " + this.getQuantity() + "\n" +
+                    "Price: " + this.getPrice() + "\n" +
+                    "Book value: " + this.getBookValue() + "\n";
+        } else if(this.getQuantity() > quantity){
+
+            double bookValueNew = (quantity * price) + comission;  //Calculating the new book value using the given formula
+            double payment = bookValueNew - comission;  //Calculating the payment using the given formula
+
+            int remainingQuantity = this.quantity - quantity;  //Calculating the remaining quantity
+            double bookValueRemaining = ((this.getQuantity() * this.getPrice()) + comission) - bookValueNew;
+
+            //Updating the quantity and book value
+            this.quantity = remainingQuantity;
+            this.bookValue = bookValueRemaining;
+            return "Payment received for selling " + quantity + " shares: " + payment + "\n" + "For the following stock:" + "\n\n" +
+                    "Symbol: " + Symbol + "\n" +
+                    "Name: " + this.getName() + "\n" +
+                    "Remaining quantity: " + this.getQuantity() + "\n" +
+                    "Remaining book value: " + this.getBookValue() + "\n";
+        }else{
+            return "Opps! You don't have enough shares to sell. Please try again.";
+        }
+
+    }
+
+    /**
+     * Calculates the gain for the stock and returns it. The gain is the difference
+     * between the payment received after selling the stock and the book value of the
+     * stock. The payment received is the current price of the stock multiplied by the
+     * quantity of the stock, minus the commission fee. The book value is the total
+     * value of the stock at the time of purchase.
+     * @return the gain for the stock
+     */
+    @Override
+    public double calculateGain(){
+        double gain = ((this.getPrice() * this.quantity) + comission) - ((this.getPreviousPrice() * this.quantity) + comission) - comission;  //Calculating the payment using the given formula
+        return gain;
+    }
+
+    
+}
+
