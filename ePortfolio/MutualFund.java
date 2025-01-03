@@ -99,3 +99,68 @@ public class MutualFund extends Investment{
     }
 
 
+/**
+     * Sells a portion of the investment.
+     * 
+     * This method updates the price of the investment, calculates the payment, and removes the investment from the list if the entire quantity is sold.
+     * 
+     * @param investments the list of investments to remove from if the entire quantity is sold
+     * @param Symbol the symbol of the investment to sell
+     * @param quantity the number of shares to sell
+     * @param price the price at which to sell
+     * @return a string indicating the result of the sale, including the payment received and the updated investment details
+     */
+    @Override
+    public String sell(ArrayList<Investment> investments, String Symbol, int quantity, double price){
+
+        this.updatePrice(price);  //Updating the price
+
+        if(this.getQuantity() == quantity){  //Case when updated price is same as before
+            double payment = (this.getPrice() * this.getQuantity()) - redemptionFee;  //Calculating the payment using the given formula
+
+            investments.remove(this);  //Removing the stock from the list if user choose to sell total
+            return "Payment received: " + payment + "\n" +
+            "This mutual fund is sold and removed from our list!" + "\n" +
+            "Symbol: " + Symbol + "\n" +
+            "Name: " + this.getName() + "\n" +
+            "Quantity: " + this.getQuantity() + "\n" +
+            "Price: " + this.getPrice() + "\n" +
+            "Book Value: " + this.getBookValue();
+        }else if(this.getQuantity() > quantity){
+
+            double bookValueNew = (quantity * this.getPrice()); //Calculating the new book value using the given formula
+            double payment = bookValueNew - redemptionFee;  //Calculating the payment using the given formula
+            
+            int remainingQuantity = this.quantity - quantity;  //Calculating the remaining quantity
+            double bookValueRemaining = ((this.getQuantity() * this.getPrice())) - bookValueNew;
+        
+            //Updating the stock's quantity and book value
+            this.quantity = remainingQuantity;
+            this.bookValue = bookValueRemaining;
+
+            return "Payment received for selling " + quantity + " shares: " + payment + "\n" + "For the following Mutual Fund:" + "\n" +
+            "Symbol: " + Symbol + "\n" +
+            "Name: " + this.getName() + "\n" +
+            "Remaining quantity: " + this.getQuantity() + "\n" +
+            "Remaining book value: " + this.getBookValue();
+        }else{
+            return "Opps! You don't have enough shares to sell!";
+        }
+    }
+
+
+    /**
+     * Calculates the gain for the mutual fund and returns it. The gain is the
+     * difference between the current value of the mutual fund and its book value
+     * minus the redemption fee. The current value of the mutual fund is the product
+     * of its price and quantity. The book value is the product of the price at the
+     * time of purchase and the quantity.
+     * @return the gain for the mutual fund
+     */
+    @Override
+    public double calculateGain() {
+        double gain = ((this.getPrice() * this.quantity)) - ((this.getPreviousPrice() * this.quantity)) - redemptionFee;  //Calculating the gain using the given formula
+        return gain;
+    }
+    
+}
