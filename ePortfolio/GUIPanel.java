@@ -249,3 +249,144 @@ public class GUIPanel {
         });
     }
 
+/**
+         * Prompts the user to enter the symbol of the investment and the quantity to sell, and then calls the
+         * sell method on the portfolio object. If the investment is not found, prints an error message.
+         * If the quantity entered is more than the quantity available, prints an error message.
+         * If selling is successful, prints a success message.
+         */
+    private void sellExistingInvestment() {
+        SwingUtilities.invokeLater(() -> {
+            JPanel registerPanel = new JPanel(new BorderLayout());
+
+            JPanel form = new JPanel(new GridBagLayout());
+            GridBagConstraints constraints = new GridBagConstraints();
+            registerPanel.add(form, BorderLayout.CENTER);
+
+            //Constraints for components
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.NORTH;
+            constraints.insets = new Insets(5, 5, 5, 5); // Add some margin
+
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            constraints.gridwidth = 2;
+            form.add(new JLabel("Selling an investment"), constraints);
+            //Symbol Label and Text Field
+            constraints.gridx = 0;
+            constraints.gridy = 1;
+            constraints.gridwidth = 1;
+            form.add(new JLabel("Symbol:"), constraints);
+
+            constraints.gridx = 1;
+            constraints.gridy = 1;
+            JTextField symbolInput = new JTextField(15);
+            form.add(symbolInput, constraints);
+
+            //Quantity Label and Text Field
+            constraints.gridx = 0;
+            constraints.gridy = 2;
+            form.add(new JLabel("Quantity:"), constraints);
+
+            constraints.gridx = 1;
+            constraints.gridy = 2;
+            JTextField quantityInput = new JTextField(15);
+            form.add(quantityInput, constraints);
+
+            //Price Label and Text Field
+            constraints.gridx = 0;
+            constraints.gridy = 3;
+            form.add(new JLabel("Price:"), constraints);
+
+            constraints.gridx = 1;
+            constraints.gridy = 3;
+            JTextField priceInput = new JTextField(15);
+            form.add(priceInput, constraints);
+
+            //Reset Button setup
+            constraints.gridx = 4;
+            constraints.gridy = 1;
+            JButton resetButton = new JButton("Reset");
+            form.add(resetButton, constraints);
+
+            //Sell Button setup
+            constraints.gridx = 4;
+            constraints.gridy = 2;
+            JButton sellButton = new JButton("Sell");
+            form.add(sellButton, constraints);
+
+            //Panel for messages with a label on top
+            JPanel messagesPanel = new JPanel(new BorderLayout());
+            JLabel messagesLabel = new JLabel("Messages:");
+            messagesPanel.add(messagesLabel, BorderLayout.NORTH);
+
+            JTextArea registerMessages = new JTextArea(10, 20);
+            registerMessages.setEditable(false);
+            messagesPanel.add(new JScrollPane(registerMessages), BorderLayout.CENTER);
+            registerPanel.add(messagesPanel, BorderLayout.SOUTH);
+
+            //Reset button action
+            resetButton.addActionListener(e -> {
+                symbolInput.setText("");
+                quantityInput.setText("");
+                priceInput.setText("");
+                registerMessages.setText("");
+            });
+
+            //Sell button action
+            sellButton.addActionListener(e -> {
+
+                try {
+                    String symbol = symbolInput.getText().trim();
+                    String quantityString = quantityInput.getText().trim();
+                    String priceString = priceInput.getText().trim();
+                    int quantity;
+                    double price;
+
+                    //Check if any fields are empty
+                    if (symbol.isEmpty() || quantityString.isEmpty() || priceString.isEmpty()) {
+                        registerMessages.append("Error: Empty fields detected. Please fill in all fields.\n");
+                        return;
+                    }
+
+                    try {
+                        quantity = Integer.parseInt(quantityInput.getText().trim());
+                        if (quantity <= 0) {
+                            throw new IllegalArgumentException("Quantity must be positive.");
+                        }
+                    } catch (NumberFormatException ex) {
+                        throw new IllegalArgumentException("Invalid quantity: Must be a valid number.");
+                    }
+
+                    try {
+                        price = Double.parseDouble(priceInput.getText().trim());
+                        if (price <= 0) {
+                            throw new IllegalArgumentException("Price must be positive.");
+                        }
+                    } catch (NumberFormatException ex) {
+                        throw new IllegalArgumentException("Invalid price: Must be a valid number.");
+                    }
+
+                    if (symbol.isEmpty()) {
+                        registerMessages.append("Symbol cannot be empty.\n");
+                        return;
+                    }
+
+                    String message = portfolio.sell(symbol, quantity, price);
+                    registerMessages.append(message + "\n");
+                } catch (IllegalArgumentException ex) {
+                    registerMessages.append("Input Error: " + ex.getMessage() + "\n");
+                } catch (Exception ex) {
+                    registerMessages.append(ex.getMessage() + "\n");
+                }
+
+            });
+
+            //Update the main frame
+            ePortfolioFrame.getContentPane().removeAll();
+            ePortfolioFrame.getContentPane().add(registerPanel);
+            ePortfolioFrame.revalidate();
+            ePortfolioFrame.repaint();
+        });
+    }
+
