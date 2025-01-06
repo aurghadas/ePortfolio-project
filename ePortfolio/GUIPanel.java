@@ -390,3 +390,171 @@ public class GUIPanel {
         });
     }
 
+/**
+ * Displays a GUI form for updating an investment. The form shows the symbol and name of the investment at the current
+ * index, and allows the user to input a new price and name. The form includes previous and next buttons to navigate
+ * through the list of investments, and a save button to apply the changes. If the user attempts to go out of bounds of
+ * the list, the buttons will be disabled. The form is updated within the main application frame.
+ */
+    private void updateInvestments() {
+        SwingUtilities.invokeLater(() -> {
+            JPanel registerPanel = new JPanel(new BorderLayout());
+
+            JPanel form = new JPanel(new GridBagLayout());
+            GridBagConstraints constraints = new GridBagConstraints();
+            registerPanel.add(form, BorderLayout.CENTER);
+
+            //Constraints for components
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.NORTH;
+            constraints.insets = new Insets(5, 5, 5, 5); // Add some margin
+
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            constraints.gridwidth = 2;
+            form.add(new JLabel("Updating investments"), constraints);
+            //Symbol Label and Text Field
+            constraints.gridx = 0;
+            constraints.gridy = 1;
+            constraints.gridwidth = 1;
+            form.add(new JLabel("Symbol:"), constraints);
+
+            constraints.gridx = 1;
+            constraints.gridy = 1;
+            JTextField symbolInput = new JTextField(15);
+            symbolInput.setEditable(false);
+            //Check to see if there are any investments then set the text field
+            if (portfolio.investments.size() > 0){
+                symbolInput.setText(portfolio.investments.get(Index).getSymbol());
+            }
+            form.add(symbolInput, constraints);
+
+            //Name Label and Text Field
+            constraints.gridx = 0;
+            constraints.gridy = 2;
+            form.add(new JLabel("Name:"), constraints);
+
+            constraints.gridx = 1;
+            constraints.gridy = 2;
+            JTextField nameInput = new JTextField(15);
+            nameInput.setEditable(false);
+            //Check to see if there are any investments then set the text field
+            if (portfolio.investments.size() > 0) {
+                nameInput.setText(portfolio.investments.get(Index).getName());
+            }
+            form.add(nameInput, constraints);
+
+            //Price Label and Text Field
+            constraints.gridx = 0;
+            constraints.gridy = 3;
+            form.add(new JLabel("Price:"), constraints);
+
+            constraints.gridx = 1;
+            constraints.gridy = 3;
+            JTextField priceInput = new JTextField(15);
+            form.add(priceInput, constraints);
+
+            //Previous Button setup
+            constraints.gridx = 4;
+            constraints.gridy = 1;
+            JButton previousButton = new JButton("Prev");
+            //Check to determine if the previous button should be enabled or not
+            if (Index == 0) {
+                previousButton.setEnabled(false);
+            } else {
+                previousButton.setEnabled(true);
+            }
+
+            form.add(previousButton, constraints);
+
+            //Next Button set up
+            constraints.gridx = 4;
+            constraints.gridy = 2;
+            JButton nextButton = new JButton("Next");
+            if (portfolio.investments.size() > 1) {
+                nextButton.setEnabled(true);
+            }
+            form.add(nextButton, constraints);
+
+            //Save Button setup
+            constraints.gridx = 4;
+            constraints.gridy = 3;
+            JButton saveButton = new JButton("Save");
+            form.add(saveButton, constraints);
+
+            //Panel for messages with a label on top
+            JPanel messagesPanel = new JPanel(new BorderLayout());
+            JLabel messagesLabel = new JLabel("Messages:");
+            messagesPanel.add(messagesLabel, BorderLayout.NORTH);
+
+            JTextArea registerMessages = new JTextArea(10, 20);
+            registerMessages.setEditable(false);
+            messagesPanel.add(new JScrollPane(registerMessages), BorderLayout.CENTER);
+            registerPanel.add(messagesPanel, BorderLayout.SOUTH);
+
+            //Previous button action
+            previousButton.addActionListener(e -> {
+                if (portfolio.investments.size() > 0) {
+                    Index = Math.max(0, Index - 1); // Decrease index but ensure it doesn't go below 0
+                    symbolInput.setText(portfolio.investments.get(Index).getSymbol());
+                    nameInput.setText(portfolio.investments.get(Index).getName());
+
+                    // Enable/disable buttons based on updated index
+                    previousButton.setEnabled(Index > 0);
+                    nextButton.setEnabled(Index < portfolio.investments.size() - 1);
+                }
+            });
+
+            //Next button action
+            nextButton.addActionListener(e -> {
+                if (portfolio.investments.size() > 0) {
+                    Index = Math.min(portfolio.investments.size() - 1, Index + 1); //Increasing the index but ensure it doesn't go above the last index
+                    symbolInput.setText(portfolio.investments.get(Index).getSymbol());
+                    nameInput.setText(portfolio.investments.get(Index).getName());
+
+                    //Enable/disable buttons based on updated index
+                    previousButton.setEnabled(Index > 0);
+                    nextButton.setEnabled(Index < portfolio.investments.size() - 1);
+                }
+            });
+
+            //Save button action
+            saveButton.addActionListener(e -> {
+                if (portfolio.investments.size() == 0) {
+                    messagesLabel.setText("You have no investments to update.");
+                    return;
+                }
+
+                try{
+                    String symbol = symbolInput.getText().trim();
+                    String name = nameInput.getText().trim();
+                    double price;
+
+                    try {
+                        price = Double.parseDouble(priceInput.getText().trim());
+                        if (price <= 0) {
+                            throw new IllegalArgumentException("Price must be positive.");
+                        }
+                    } catch (NumberFormatException ex) {
+                        throw new IllegalArgumentException("Invalid price: Must be a valid number.");
+                    }
+                    
+
+                    String result = portfolio.update(symbol, price, name);
+                    registerMessages.append(result + "\n");
+                } catch (IllegalArgumentException ex) {
+                    registerMessages.append("Error: " + ex.getMessage() + "\n");
+                }catch (Exception ex) {
+                    registerMessages.append(ex.getMessage() + "\n");
+                }   
+                
+            });
+
+            //Update the main frame
+            ePortfolioFrame.getContentPane().removeAll();
+            ePortfolioFrame.getContentPane().add(registerPanel);
+            ePortfolioFrame.revalidate();
+            ePortfolioFrame.repaint();
+        });
+    }
+
