@@ -558,3 +558,213 @@ public class GUIPanel {
         });
     }
 
+/**
+     * Displays a GUI form for getting the total gain of all investments in the
+     * portfolio. The form includes a label and text field for the total gain, and a
+     * panel for displaying individual gains for each investment. Individual gains
+     * are displayed in a text area with a label on top. The form is updated within
+     * the main application frame.
+     */
+    private void getTotalGain() {
+        SwingUtilities.invokeLater(() -> {
+            JPanel registerPanel = new JPanel(new BorderLayout());
+
+            JPanel form = new JPanel(new GridBagLayout());
+            GridBagConstraints constraints = new GridBagConstraints();
+            registerPanel.add(form, BorderLayout.CENTER);
+
+            //Constraints for components
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.NORTH;
+            constraints.insets = new Insets(5, 5, 5, 5); 
+
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            constraints.gridwidth = 2;
+            form.add(new JLabel("Getting total gain"), constraints);
+            //Total Gain Label and Text Field
+            constraints.gridx = 0;
+            constraints.gridy = 1;
+            constraints.gridwidth = 1;
+            form.add(new JLabel("Total gain:"), constraints);
+
+            constraints.gridx = 1;
+            constraints.gridy = 1;
+            JTextField totalGain = new JTextField(15);
+            totalGain.setEditable(false); 
+            form.add(totalGain, constraints);
+            totalGain.setText(portfolio.calculateGain());
+
+            //Panel for individual gains with a label on top
+            JPanel messagesPanel = new JPanel(new BorderLayout());
+            JLabel messagesLabel = new JLabel("Individual gains:");
+            messagesPanel.add(messagesLabel, BorderLayout.NORTH);
+
+            JTextArea registerMessages = new JTextArea(20, 20);
+            registerMessages.setEditable(false);
+            String[] individualGains = portfolio.calculateIndividualInvestmentGain();
+            //Loop to display individual gains
+            for (int i = 0; i < individualGains.length; i++) {
+                registerMessages.append(individualGains[i] + "\n");
+            }
+            messagesPanel.add(new JScrollPane(registerMessages), BorderLayout.CENTER);
+            registerPanel.add(messagesPanel, BorderLayout.SOUTH);
+
+            //Update the main frame
+            ePortfolioFrame.getContentPane().removeAll();
+            ePortfolioFrame.getContentPane().add(registerPanel);
+            ePortfolioFrame.revalidate();
+            ePortfolioFrame.repaint();
+        });
+    }
+
+        /**
+         * Displays a GUI form for searching investments in the portfolio. The form
+         * includes text fields for symbol, name keywords, low price, and high price.
+         * The user can enter any of these fields to search for the relevant
+         * investments. The search results are displayed in a text area with a label
+         * on top. The form is updated within the main application frame.
+         */
+    private void searchInvestments() {
+        SwingUtilities.invokeLater(() -> {
+            JPanel registerPanel = new JPanel(new BorderLayout());
+
+            JPanel form = new JPanel(new GridBagLayout());
+            GridBagConstraints constraints = new GridBagConstraints();
+            registerPanel.add(form, BorderLayout.CENTER);
+
+            //Constraints for components
+            constraints.fill = GridBagConstraints.HORIZONTAL;
+            constraints.anchor = GridBagConstraints.NORTH;
+            constraints.insets = new Insets(5, 5, 5, 5); // Add some margin
+
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            constraints.gridwidth = 2;
+            form.add(new JLabel("Searching investments"), constraints);
+            //Symbol Label and Text Field
+            constraints.gridx = 0;
+            constraints.gridy = 1;
+            constraints.gridwidth = 1;
+            form.add(new JLabel("Symbol:"), constraints);
+
+            constraints.gridx = 1;
+            constraints.gridy = 1;
+            JTextField symbolInput = new JTextField(15);
+            form.add(symbolInput, constraints);
+
+            //Name Keywords Label and Text Field
+            constraints.gridx = 0;
+            constraints.gridy = 2;
+            form.add(new JLabel("Name keywords:"), constraints);
+
+            constraints.gridx = 1;
+            constraints.gridy = 2;
+            JTextField nameKeywordsInput = new JTextField(15);
+            form.add(nameKeywordsInput, constraints);
+
+            //Low Price Label and Text Field
+            constraints.gridx = 0;
+            constraints.gridy = 3;
+            form.add(new JLabel("Low price:"), constraints);
+
+            constraints.gridx = 1;
+            constraints.gridy = 3;
+            JTextField lowPriceInput = new JTextField(15);
+            form.add(lowPriceInput, constraints);
+
+            //High Price Label and Text Field
+            constraints.gridx = 0;
+            constraints.gridy = 4;
+            form.add(new JLabel("High price:"), constraints);
+
+            constraints.gridx = 1;
+            constraints.gridy = 4;
+            JTextField highPriceInput = new JTextField(15);
+            form.add(highPriceInput, constraints);
+
+            //Reset Button setup
+            constraints.gridx = 4;
+            constraints.gridy = 1;
+            JButton resetButton = new JButton("Reset");
+            form.add(resetButton, constraints);
+
+            //Search Button setup
+            constraints.gridx = 4;
+            constraints.gridy = 3;
+            JButton searchButton = new JButton("Search");
+            form.add(searchButton, constraints);
+
+            //Panel for Search results with a label on top
+            JPanel messagesPanel = new JPanel(new BorderLayout());
+            JLabel messagesLabel = new JLabel("Search results:");
+            messagesPanel.add(messagesLabel, BorderLayout.NORTH);
+
+            JTextArea registerMessages = new JTextArea(10, 20);
+            registerMessages.setEditable(false);
+            messagesPanel.add(new JScrollPane(registerMessages), BorderLayout.CENTER);
+            registerPanel.add(messagesPanel, BorderLayout.SOUTH);
+
+            //Reset button action
+            resetButton.addActionListener(e -> {
+                symbolInput.setText("");
+                nameKeywordsInput.setText("");
+                lowPriceInput.setText("");
+                highPriceInput.setText("");
+                registerMessages.setText("");
+            });
+
+            //Search button action
+            searchButton.addActionListener(e -> {
+                
+
+                try{
+                    String symbol = symbolInput.getText().trim();
+                    String nameKeywords = nameKeywordsInput.getText().trim();
+
+                    String lowPrice = lowPriceInput.getText().trim();
+                    String highPrice = highPriceInput.getText().trim();
+
+                    if(!lowPrice.isEmpty()){
+                        try {
+                            double lPrice = Double.parseDouble(lowPriceInput.getText().trim());
+                            if (lPrice <= 0) {
+                                throw new IllegalArgumentException("Lower price must be positive.");
+                            }
+                        } catch (NumberFormatException ex) {
+                            throw new IllegalArgumentException("Invalid lower price: Must be a valid number.");
+                        }
+                    }
+
+                    if(!highPrice.isEmpty()){
+                        try {
+                            double hPrice = Double.parseDouble(highPriceInput.getText().trim());
+                            if (hPrice <= 0) {
+                                throw new IllegalArgumentException("Higher price must be positive.");
+                            }
+                        } catch (NumberFormatException ex) {
+                            throw new IllegalArgumentException("Invalid higher price: Must be a valid number.");
+                        }
+                    }
+                    
+                    
+                    String[] results = portfolio.searchOperation(symbol, lowPrice, highPrice, nameKeywords);
+                    for (String result : results){
+                        registerMessages.append(result + "\n");
+                    }
+                }catch (IllegalArgumentException ex) {
+                    registerMessages.append("Error: " + ex.getMessage() + "\n");
+                }catch (Exception ex) {
+                    registerMessages.append(ex.getMessage() + "\n");
+                }   
+                
+            });
+
+            //Update the main frame
+            ePortfolioFrame.getContentPane().removeAll();
+            ePortfolioFrame.getContentPane().add(registerPanel);
+            ePortfolioFrame.revalidate();
+            ePortfolioFrame.repaint();
+        });
+    }
+
