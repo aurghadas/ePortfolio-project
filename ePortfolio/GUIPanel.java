@@ -768,3 +768,66 @@ public class GUIPanel {
         });
     }
 
+/**
+ * Exits the application after saving the current state of the portfolio to a file.
+ * If a specific file name is provided, the portfolio is saved with that name.
+ * Otherwise, it is saved with a default file name "cis2430".
+ */
+    private void quitCommand() {
+        if (fileName != null) {
+            portfolio.saveInvestments(fileName);  //Case when filename is provided
+
+        }
+        else{
+            portfolio.saveInvestments("cis2430");  //Case when filename is not provided
+        }
+        System.exit(0);
+    }
+
+/**
+ * Displays a welcome message and provides instructions for using the
+ * application. This method is called when the application is first
+ * launched.
+ */
+    private void greetingPanel() {
+
+        JPanel registerPanel = new JPanel();
+        JPanel form = new JPanel(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        registerPanel.add(form, BorderLayout.CENTER);
+
+        //Constraints for components
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.anchor = GridBagConstraints.NORTH;
+        constraints.insets = new Insets(5, 5, 5, 5);
+
+        //Adding labels for the welcome message
+        constraints.gridx = 5;
+        constraints.gridy = 5;
+        constraints.gridwidth = 2;
+        form.add(new JLabel("Welcome to ePortfolio.\n"), constraints);
+
+        constraints.gridx = 5;
+        constraints.gridy = 10;
+        constraints.gridwidth = 2;
+        form.add(new JLabel("Choose a command from the \"Commands\" menu to buy or sell"), constraints);
+
+        constraints.gridx = 5;
+        constraints.gridy = 11;
+        constraints.gridwidth = 2;
+        form.add(new JLabel("an investment, update prices for all investments, get gain for the"), constraints);
+
+        constraints.gridx = 5;
+        constraints.gridy = 12;
+        constraints.gridwidth = 2;
+        form.add(new JLabel("portfolio, search for relevant investments, or quit the program."), constraints);
+
+
+        //Update the main frame
+        ePortfolioFrame.getContentPane().removeAll();
+        ePortfolioFrame.getContentPane().add(registerPanel);
+        ePortfolioFrame.revalidate();
+        ePortfolioFrame.repaint();
+    }
+
+}
